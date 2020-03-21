@@ -1,5 +1,5 @@
 # Python-Web-Scrapinng (COVID19-THAI)
-ติดตามสถานการณ์ผ่านไลน์ได้
+ติดตามสถานการณ์ผ่านไลน์ OR-CODE ข้างนี้ได้เลยครับ
 
 <img src="https://user-images.githubusercontent.com/9077501/77223913-707fa700-6b93-11ea-9b20-229028daf421.jpg" width="100" height="100">
 
