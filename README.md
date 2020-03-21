@@ -1,7 +1,7 @@
 # Python-Web-Scrapinng (COVID19-THAI)
 ติดตามสถานการณ์ผ่านไลน์ได้
-![LINE-COVID-THAI](https://user-images.githubusercontent.com/9077501/77223913-707fa700-6b93-11ea-9b20-229028daf421.jpg){:height="50%" width="50%"}
 
+<LINE-COVID-THAI src="https://user-images.githubusercontent.com/9077501/77223913-707fa700-6b93-11ea-9b20-229028daf421.jpg" width="100" height="100">
 
 ## การส่งไลน์
 เพื่อให้โปรแกรมส่งข้อมูลผ่านไลน์ อย่าลืมสร้าง Token เพื่อส่งด้วยนะครับ
