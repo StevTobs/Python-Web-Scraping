@@ -1,6 +1,6 @@
 # Python-Web-Scrapinng (COVID19-THAI)
 ติดตามสถานการณ์ผ่านไลน์ได้
-![90043542_2715235082043572_6781124534222192640_n](https://user-images.githubusercontent.com/9077501/77223877-06ff9880-6b93-11ea-8028-331d22d18b0e.jpg)
+![LINE-COVID-THAI](https://user-images.githubusercontent.com/9077501/77223913-707fa700-6b93-11ea-9b20-229028daf421.jpg)
 
 
 ## การส่งไลน์
