@@ -1,4 +1,4 @@
-# Python-Web-Scrapinng
+# Python-Web-Scrapinng (COVID19-THAI)
 
 ## การส่งไลน์
 เพื่อให้โปรแกรมส่งข้อมูลผ่านไลน์ อย่าลืมสร้าง Token เพื่อส่งด้วยนะครับ
