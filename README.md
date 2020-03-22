@@ -1,9 +1,9 @@
 # Python-Web-Scrapinng (COVID19-THAI)
 
-__author__ = "COVID19-in-THAI"
-__copyright__ = "Copyright (C) 2020 Akanit Kwangkaew"
-__license__ = "www.facebook.com/codingjingjo"
-__version__ = "1.1"
+__COVID19-in-THAI__ 
+__Copyright (C) 2020 Akanit Kwangkaew__ 
+__license__ 
+__www.facebook.com/codingjingjo__ 
 
 
 ### ติดตามสถานการณ์ผ่านไลน์ QR-CODE ข้างนี้ได้เลยครับ
