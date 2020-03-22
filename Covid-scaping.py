@@ -1,3 +1,13 @@
+'''
+
+Covid19-Thai
+Copyright (C) 2004 Akanit Kwangkaew
+www.facebook.com/codingjingjo
+"1.1"
+
+'''
+
+
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from songline import Sendline
@@ -6,128 +16,179 @@ import datetime
 import csv 
 from bs4 import BeautifulSoup as soup
 
-opt = webdriver.ChromeOptions()
-opt.add_argument('headless') #hidden mode of chorme driver
-opt.add_experimental_option('excludeSwitches', ['enable-logging'])
 
-driver = webdriver.Chrome(options=opt) #create driver
-options = webdriver.ChromeOptions()
-url = 'https://ddcportal.ddc.moph.go.th/portal/apps/opsdashboard/index.html#/20f3466e075e45e5946aa87c96e8ad65'
-driver.get(url) # open web
-time.sleep(3)
+class Covid19_thai:
 
-page_html = driver.page_source
-data = soup(page_html,'html.parser') # Scan data
-#html.parser: แปลง source code ให้กลับไปเป็น html
+    def __init__(self, url, csv_path):
+        self.csv_path = csv_path
+        print("Loading ...", end ="")
+        opt = webdriver.ChromeOptions()
+        opt.add_argument('headless') #hidden mode of chorme driver
+        opt.add_experimental_option('excludeSwitches', ['enable-logging'])
+        print(".", end ="")
+        driver = webdriver.Chrome(options=opt) #create driver   
+        print(".", end ="")    
+        driver.get(url) # open web
+        print(".", end ="")
+        time.sleep(3)
+        print(".", end ="")
+        page_html = driver.page_source
+        print(".", end ="")
+        #html.parser: แปลง source code ให้กลับไปเป็น html
+        self.data = soup(page_html,'html.parser')
+        print(".", end ="")
+        driver.close()
+        print(".")
 
-driver.close()
+    def get_patient_url_1(self):
 
-#ขั้นตอนการดึงข้อมูลจาก html
-
-raw = data.find("body", {"class": "claro ember-application"})
-
-ember89 = raw.find("div",{"id":"ember89","class":"dock-element ember-view"})
-
-g = ember89.findAll('text')
-
-#จำนวนผู้ป่วยที่ update จาก dashboard
-g[1]
-
-covid_num = g[1].text
-
-print("=========Ene Scraping==========")
-
-
-########################
-#ส่วนของการ savefile
-
-currentDT = datetime.datetime.now()
-key = currentDT.strftime("%Y-%m-%d %H:%M:%S")
-value = covid_num
-
-
-# csv_file = 'covid19-thai-recorded.csv'
-#Openfile
-with open('covid19-thai-recorded.csv') as f:
-    d = dict(filter(None, csv.reader(f)))
-
-#ดูประวัติ dictionary
-print(d)
- 
-#Get the last number of covid19's patients
-while True:
-    try: 
-        last_covid19  =   d[  list( d.keys())[-1] ] 
-        break
-
-    except ValueError:
-        last_covid19  =   covid_num
-    
-
-
-#Update dictionary
-d.update( {key  : last_covid19 } )
-
-
-#Save
-with open('covid19-thai-recorded.csv', 'w', newline="") as csv_file:  
-    writer = csv.writer(csv_file)
-    for k, v in d.items():
-       writer.writerow([k, v])
-
-
-
-
-
-
-########################
-#ส่วนการส่ง Line
-
-#Send to Line
-#อย่าลืมสร้าง Token นะครับ
-
-token_me = ' ... '
-token_line_group = ' ... '
-
-
-currentDT = datetime.datetime.now()
-
-print ( currentDT.strftime("%Y-%m-%d %H:%M:%S") )
-
-time_today =  str( currentDT.strftime("%Y-%m-%d  %H:%M:%S") )
-
-text_ = 'ขณะนี้มียอดผู้ป่วย Covid19 ในประเทศไทยที่ยืนยันแล้ว \nจำนวน ' + covid_num + ' คน \nข้อมูลวันที่ '+ time_today
-
-print(text_)
-
-
-last_covid19    = int( last_covid19  )
-covid_num       = int( covid_num ) 
-
-if (covid_num > last_covid19):
-
-    text_  = text_  + '\nมียอดผู้ป่วยเพิ่มขึ้น : ' + str( covid_num - last_covid19 ) + ' คน'
-
-    messenger = Sendline( token_me  )
-    messenger.sendtext(text_)
-
-    messenger = Sendline( token_line_group )
-    messenger.sendtext(text_)
-
-elif (covid_num < last_covid19):
+        self.ref_url_1 = "covid19.workpointnews.com"
         
-    text_  = text_  + '\nมียอดผู้ป่วยลดลง: ' + str(  last_covid19 - covid_num )+ ' คน'
+
+        #ดึงจำนวนผู้ป่วย
+        raw = self.data.find("div", {"class": "css-ttf0vs e9w21k51"})
+        covid19_patient_thai = raw.find("div", {"class": "css-5455pe e2xuun72"})
+        self.covid_num = covid19_patient_thai.text
+
+        #ดึงจำนวนผู้ป่วยที่เปลี่ยนแปลง
+        # <div class="css-rwqtsj e2xuun73">(เพิ่ม 188 คน) เมื่อ 22/3/2020</div>
+        raw = self.data.find("div", {"class": "css-rwqtsj e2xuun73"})       
+        self.covid_change_num = raw.text
+
+        #รักษาหายแล้ว
+ 
+        raw = self.data.find("div", {"class": "e9w21k54 css-xn1zjs e2xuun70"})
+        raw = raw.find("div", {"class": "css-bj5ob2 e2xuun72"})
+        self.covid_recover_num = raw.text
+
+
+        #ดึงจำนวนผู้เสียชีวิต
+        # <div class="e9w21k55 css-9se48y e2xuun70"><div class="css-1mxp76p e2xuun71">เสียชีวิต</div><div class="css-bj5ob2 e2xuun72">1</div></div>
+        raw = self.data.find("div", {"class": "e9w21k55 css-9se48y e2xuun70"} )
+        
+        covid_dead = raw.find("div", {"class": "css-bj5ob2 e2xuun72"})
+        self.covid_dead_num = covid_dead.text
+
+        return self.covid_num, self.covid_change_num, self.covid_recover_num, self.covid_dead_num, self.ref_url_1
+
+    def get_previous_patient(self):
+
+        #ดึงข้อมูลจากแหล่งข่าวที่ 1 (url_1)
+        covid_num, dummy, dummy, dummy, dummy = self.get_patient_url_1()
+        
+        csv_path = self.csv_path
+
+        #Openfile
+        with open(csv_path) as f:
+            d = dict(filter(None, csv.reader(f)))
+        
+        #Get the last number of covid19's patients
+        while True:
+            try: 
+                last_covid19  =   d[  list( d.keys())[-1] ] 
+                break
+
+            except ValueError:
+                last_covid19  =   covid_num
+        return last_covid19 
+
+    def update_to_csv (self):
+        csv_path = self.csv_path
+        #ดึงข้อมูลจากแหล่งข่าวที่ 1 (url_1)
+        covid_num, dummy, dummy, dummy, dummy  = self.get_patient_url_1()
+
+        currentDT = datetime.datetime.now()
+
+        #เตรียมข้อมูลที่จะ Update
+        key = currentDT.strftime("%Y-%m-%d %H:%M:%S")
+        value = covid_num
+     
+        with open(csv_path) as f:
+            d = dict(filter(None, csv.reader(f)))
+
+        #Update dictionary
+        d.update( {key  : value} )
+
+        #Save
+        with open( csv_path , 'w', newline="") as csv_file:  
+            writer = csv.writer(csv_file)
+            for k, v in d.items():
+                writer.writerow([k, v])
     
-    messenger = Sendline( token_me  )
-    messenger.sendtext(text_)
+    def report(self):
+        
+        currentDT = datetime.datetime.now()       
+        time_today =  str( currentDT.strftime("%d-%m-%Y %H:%M:%S") )
+
+        #ดึงข้อมูลจากแหล่งข่าวที่ 1 (url_1)
+        covid_num, covid_change_num, covid_recover_num, covid_dead_num, ref_url_1 = self.get_patient_url_1()
+
+        chk_change , text = self.check_change()
+
+        report_text = text + '\nขณะนี้มียอดผู้ป่วย COVID19 ในประเทศไทย\nจำนวน: '+covid_num+' คน'
+        report_text = report_text + '\n ' + covid_change_num
+        report_text = report_text + '\nรักษาหาย: '+covid_recover_num+' คน'
+        report_text = report_text + '\nเสียชีวิต: '+covid_dead_num +' คน'
+        report_text = report_text + '\nTime: '+ time_today
+        report_text = report_text + '\nSource: '+ ref_url_1
+        # print(report_text )
+
+        return report_text
+
+    def send_Line(self, token):
+
+        text = self.report()
+
+        for k , tk in token.items() :
+            messenger = Sendline( tk )
+            messenger.sendtext(text)
+            print('Sent to :'+ k )
+
+    def check_change(self):
+
+        chk_change = False
+        text = ""
 
 
-    messenger = Sendline(token_line_group)
-    messenger.sendtext(text_)
+        #ดึงข้อมูลจากแหล่งข่าวที่ 1 (url_1)
+        covid_num, dummy, dummy, dummy, dummy  = self.get_patient_url_1()
 
-else :
-    messenger = Sendline( token_me  )
-    messenger.sendtext(text_)
+        prev_patient = int( self.get_previous_patient( ) )
+        last_patient = int( covid_num)
 
-    messenger = Sendline( token_line_group )
-    messenger.sendtext(text_)
+        print("prev_patient", prev_patient)
+        print("last_patient", last_patient)
+
+        if(prev_patient != last_patient):  
+
+            if(prev_patient < last_patient):
+                text = 'มียอดผู้ป่วยเพิ่มขึ้น '+ str(last_patient - prev_patient)  
+                chk_change = True
+                return chk_change , text
+
+            elif (prev_patient > last_patient) :   
+                text = 'มียอดผู้ป่วยลดลง' + str( prev_patient - last_patient)  + ' :)'
+                chk_change = True
+
+                return chk_change , text
+                             
+        else:
+            chk_change = False
+            return chk_change , text
+
+
+if __name__ == "__main__":
+
+    #แหล่งข่าว url1: Work Point News
+    url_1 = 'https://covid19.workpointnews.com/?fbclid=IwAR0WRCG6g4vr6amf5XiXNpIzRImCpK3b3nMK2vGuyMCpwYEB7Maan0Z_BKM'
+    covid19_thai = Covid19_thai(url_1, 'covid19-thai-recorded.csv')
+    covid19_thai.report()
+
+    #เช็คยอดผู้ป่วยที่เปลี่ยนแปลง
+    chk, dmm  = covid19_thai.check_change()
+
+    #ส่ง Line เมื่อยอดผู้ป่วยเปลี่ยนแปลง
+    if(chk == True ):
+
+        token = {   "token"          : '< input your token here!!! >'}
+        covid19_thai.send_Line( token )
