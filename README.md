@@ -8,4 +8,6 @@
 โดยสามาถสร้างผ่านเว็ป https://notify-bot.line.me/
 
 ## อ้างอิงข้อมูลจาก
-Source: https://ddcportal.ddc.moph.go.th/portal/apps/opsdashboard/index.html#/20f3466e075e45e5946aa87c96e8ad65
+
+(เร็วกว่า)ed Source: https://covid19.workpointnews.com/?fbclid=IwAR0WRCG6g4vr6amf5XiXNpIzRImCpK3b3nMK2vGuyMCpwYEB7Maan0Z_BKM
+(กรมควบคุมโรค)Source: https://ddcportal.ddc.moph.go.th/portal/apps/opsdashboard/index.html#/20f3466e075e45e5946aa87c96e8ad65
