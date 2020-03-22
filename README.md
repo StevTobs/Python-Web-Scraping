@@ -1,8 +1,11 @@
 # Python-Web-Scrapinng (COVID19-THAI)
 
 __COVID19-in-THAI__ 
+
 __Copyright (C) 2020 Akanit Kwangkaew__ 
+
 __license__ 
+
 __www.facebook.com/codingjingjo__ 
 
 
