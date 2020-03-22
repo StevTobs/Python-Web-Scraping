@@ -4,9 +4,11 @@ __COVID19-in-THAI__
 
 __Copyright (C) 2020 Akanit Kwangkaew__ 
 
+__ver.1.1__
+
 __www.facebook.com/codingjingjo__ 
 
-__ver.1.1__
+
 ___
 ### ติดตามสถานการณ์ผ่านไลน์ QR-CODE ข้างนี้ได้เลยครับ
 
