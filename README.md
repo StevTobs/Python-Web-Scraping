@@ -1,4 +1,4 @@
-# Python-Web-Scrapinng (COVID19-THAI)
+# Python-Web-Scrapinng (COVID19-in-THAI)
 
 __COVID19-in-THAI__ 
 
