@@ -10,7 +10,7 @@ __www.facebook.com/codingjingjo__
 
 
 ___
-### ติดตามสถานการณ์ผ่านไลน์ QR-CODE ข้างนี้ได้เลยครับ
+### ติดตามสถานการณ์ผ่านไลน์ QR-CODE ข้างล่างนี้ได้เลยครับ
 
 <img src="https://user-images.githubusercontent.com/9077501/77223913-707fa700-6b93-11ea-9b20-229028daf421.jpg" width="100" height="100">
 
