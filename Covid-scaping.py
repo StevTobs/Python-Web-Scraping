@@ -82,14 +82,16 @@ class Covid19_thai:
         with open(csv_path) as f:
             d = dict(filter(None, csv.reader(f)))
         
-        #Get the last number of covid19's patients
+        
         while True:
             try: 
+                #Get the last number of covid19's patients
                 last_covid19  =   d[  list( d.keys())[-1] ] 
                 break
 
             except ValueError:
                 last_covid19  =   covid_num
+
         return last_covid19 
 
     def update_to_csv (self):
@@ -114,6 +116,8 @@ class Covid19_thai:
             writer = csv.writer(csv_file)
             for k, v in d.items():
                 writer.writerow([k, v])
+        
+        print("Saved to CSV!!")
     
     def report(self):
         
@@ -126,7 +130,7 @@ class Covid19_thai:
         chk_change , text = self.check_change()
 
         report_text = text + '\nขณะนี้มียอดผู้ป่วย COVID19 ในประเทศไทย\nจำนวน: '+covid_num+' คน'
-        report_text = report_text + '\n ' + covid_change_num
+        # report_text = report_text + '\n ' + covid_change_num
         report_text = report_text + '\nรักษาหาย: '+covid_recover_num+' คน'
         report_text = report_text + '\nเสียชีวิต: '+covid_dead_num +' คน'
         report_text = report_text + '\nTime: '+ time_today
@@ -156,8 +160,8 @@ class Covid19_thai:
         prev_patient = int( self.get_previous_patient( ) )
         last_patient = int( covid_num)
 
-        print("prev_patient", prev_patient)
-        print("last_patient", last_patient)
+        # print("prev_patient", prev_patient)
+        # print("last_patient", last_patient)
 
         if(prev_patient != last_patient):  
 
@@ -184,11 +188,14 @@ if __name__ == "__main__":
     covid19_thai = Covid19_thai(url_1, 'covid19-thai-recorded.csv')
     covid19_thai.report()
 
-    #เช็คยอดผู้ป่วยที่เปลี่ยนแปลง
     chk, dmm  = covid19_thai.check_change()
 
-    #ส่ง Line เมื่อยอดผู้ป่วยเปลี่ยนแปลง
     if(chk == True ):
+    #เช็คยอดผู้ป่วยที่เปลี่ยนแปลง
 
-        token = {   "token"          : '< input your token here!!! >'}
+        token = {   "ชื่อผไลน์ผู้รับ"          : '< input your token here!!! >'}
+        #ส่ง Line เมื่อยอดผู้ป่วยเปลี่ยนแปลง
         covid19_thai.send_Line( token )
+
+    covid19_thai.update_to_csv()
+
