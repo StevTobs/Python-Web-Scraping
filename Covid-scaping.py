@@ -7,7 +7,6 @@ www.facebook.com/codingjingjo
 
 '''
 
-
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from songline import Sendline
@@ -47,27 +46,29 @@ class Covid19_thai:
 
         #ดึงจำนวนผู้ป่วย
         raw = self.data.find("div", {"class": "css-ttf0vs e9w21k51"})
-        covid19_patient_thai = raw.find("div", {"class": "css-5455pe e2xuun72"})
+        # print(raw)
+        covid19_patient_thai = raw.find("div", {"class": "css-b10qi3 e2xuun72"})
         self.covid_num = covid19_patient_thai.text
 
         #ดึงจำนวนผู้ป่วยที่เปลี่ยนแปลง
-        # <div class="css-rwqtsj e2xuun73">(เพิ่ม 188 คน) เมื่อ 22/3/2020</div>
-        raw = self.data.find("div", {"class": "css-rwqtsj e2xuun73"})       
-        self.covid_change_num = raw.text
+       
+        covid_change = raw.find("div", {"class": "css-rwqtsj e2xuun73"})       
+        self.covid_change_num = covid_change.text
 
         #รักษาหายแล้ว
  
-        raw = self.data.find("div", {"class": "e9w21k54 css-xn1zjs e2xuun70"})
-        raw = raw.find("div", {"class": "css-bj5ob2 e2xuun72"})
-        self.covid_recover_num = raw.text
+        covid_recover = raw.find("div", {"class": "e9w21k54 css-1w3ca84 e2xuun70"})
+        covid_recover = covid_recover.find("div", {"class": "css-9bda02 e2xuun72"})
+        
+        self.covid_recover_num = covid_recover.text
 
 
         #ดึงจำนวนผู้เสียชีวิต
         # <div class="e9w21k55 css-9se48y e2xuun70"><div class="css-1mxp76p e2xuun71">เสียชีวิต</div><div class="css-bj5ob2 e2xuun72">1</div></div>
-        raw = self.data.find("div", {"class": "e9w21k55 css-9se48y e2xuun70"} )
         
-        covid_dead = raw.find("div", {"class": "css-bj5ob2 e2xuun72"})
-        self.covid_dead_num = covid_dead.text
+        covid_dead = raw.find("div", {"class": "e9w21k55 css-ntnmqw e2xuun70"})
+       
+        self.covid_dead_num = covid_dead.find("div", {"class": "css-9bda02 e2xuun72"}).text
 
         return self.covid_num, self.covid_change_num, self.covid_recover_num, self.covid_dead_num, self.ref_url_1
 
