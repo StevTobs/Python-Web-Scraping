@@ -1,7 +1,7 @@
 '''
 
 Covid19-Thai
-Copyright (C) 2004 Akanit Kwangkaew
+Copyright (C) 2020 Akanit Kwangkaew
 www.facebook.com/codingjingjo
 "1.1"
 
