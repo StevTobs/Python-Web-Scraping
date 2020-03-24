@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 '''
 
 Covid19-Thai
@@ -5,12 +8,25 @@ Copyright (C) 2004 Akanit Kwangkaew
 www.facebook.com/codingjingjo
 "1.1"
 
+Installation Process (MAC)
+1. >> pip install selenium
+2. install: chrome driver (or other driver)
+  Download file from
+  https://chromedriver.storage.googleapis.com/index.html?path=81.0.4044.69/
+  Do not forget to correct version
+3. install: Beautifulsoup
+   >> pip install Beautifulsoup
+4. >> pip install songline
+
+
 '''
+
 
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from songline import Sendline
 import time
+import json
 import datetime 
 import csv 
 from bs4 import BeautifulSoup as soup
@@ -21,15 +37,17 @@ class Covid19_thai:
     def __init__(self, url, csv_path):
         self.csv_path = csv_path
         print("Loading ...", end ="")
+        # driver = webdriver.Chrome(executable_path='C:/path/to/chromedriver.exe')
         opt = webdriver.ChromeOptions()
         opt.add_argument('headless') #hidden mode of chorme driver
         opt.add_experimental_option('excludeSwitches', ['enable-logging'])
         print(".", end ="")
-        driver = webdriver.Chrome(options=opt) #create driver   
+        driver = webdriver.Chrome(options=opt, executable_path = '/Users/TopBook/Google Drive/CODE/AUTORUN/chromedriver')
+        # driver = webdriver.Chrome(options=opt) #create driver   
         print(".", end ="")    
         driver.get(url) # open web
         print(".", end ="")
-        time.sleep(3)
+        # time.sleep(3)
         print(".", end ="")
         page_html = driver.page_source
         print(".", end ="")
@@ -72,10 +90,34 @@ class Covid19_thai:
 
         return self.covid_num, self.covid_change_num, self.covid_recover_num, self.covid_dead_num, self.ref_url_1
 
+    def get_patient_url_2(self):
+
+        ref_url_2 = "https://covid19-cdn.workpointnews.com/api/constants.json"
+        raw = self.data.find('body').text
+        d = json.loads( raw )
+      
+        #ดึงจำนวนผู้ป่วย
+        covid_num = d ['ผู้ติดเชื้อ']
+
+        #ดึงจำนวนผู้ป่วยที่เปลี่ยนแปลง
+        covid_change_num = d['เพิ่มวันนี้']
+
+        #รักษาหายแล้ว
+        covid_recover_num = d ['หายแล้ว']
+
+
+        #ดึงจำนวนผู้เสียชีวิต
+        covid_dead_num = d['เสียชีวิต']
+
+        return covid_num, covid_change_num, covid_recover_num, covid_dead_num, ref_url_2
+
     def get_previous_patient(self):
 
         #ดึงข้อมูลจากแหล่งข่าวที่ 1 (url_1)
-        covid_num, dummy, dummy, dummy, dummy = self.get_patient_url_1()
+        # covid_num, dummy, dummy, dummy, dummy = self.get_patient_url_1()
+
+        #ดึงข้อมูลจากแหล่งข่าวที่ 1 (url_1)
+        covid_num, dummy, dummy, dummy, dummy = self.get_patient_url_2()
         
         csv_path = self.csv_path
 
@@ -98,7 +140,9 @@ class Covid19_thai:
     def update_to_csv (self):
         csv_path = self.csv_path
         #ดึงข้อมูลจากแหล่งข่าวที่ 1 (url_1)
-        covid_num, dummy, dummy, dummy, dummy  = self.get_patient_url_1()
+        # covid_num, dummy, dummy, dummy, dummy  = self.get_patient_url_1()
+
+        covid_num, dummy, dummy, dummy, dummy  = self.get_patient_url_2()
 
         currentDT = datetime.datetime.now()
 
@@ -125,9 +169,9 @@ class Covid19_thai:
         currentDT = datetime.datetime.now()       
         time_today =  str( currentDT.strftime("%d-%m-%Y %H:%M:%S") )
 
-        #ดึงข้อมูลจากแหล่งข่าวที่ 1 (url_1)
-        covid_num, covid_change_num, covid_recover_num, covid_dead_num, ref_url_1 = self.get_patient_url_1()
-
+        #ดึงข้อมูลจากแหล่งข่าวที่ 2 (url_2)
+        # covid_num, covid_change_num, covid_recover_num, covid_dead_num, ref_url = self.get_patient_url_1()
+        covid_num, covid_change_num, covid_recover_num, covid_dead_num, ref_url = self.get_patient_url_2()
         chk_change , text = self.check_change()
 
         report_text = text + '\nขณะนี้มียอดผู้ป่วย COVID19 ในประเทศไทย\nจำนวน: '+covid_num+' คน'
@@ -135,7 +179,7 @@ class Covid19_thai:
         report_text = report_text + '\nรักษาหาย: '+covid_recover_num+' คน'
         report_text = report_text + '\nเสียชีวิต: '+covid_dead_num +' คน'
         report_text = report_text + '\nTime: '+ time_today
-        report_text = report_text + '\nSource: '+ ref_url_1
+        report_text = report_text + '\nSource: '+ ref_url
         # print(report_text )
 
         return report_text
@@ -155,8 +199,8 @@ class Covid19_thai:
         text = ""
 
 
-        #ดึงข้อมูลจากแหล่งข่าวที่ 1 (url_1)
-        covid_num, dummy, dummy, dummy, dummy  = self.get_patient_url_1()
+        #ดึงข้อมูลจากแหล่งข่าวที่ 2 (url_2)
+        covid_num, dummy, dummy, dummy, dummy  = self.get_patient_url_2()
 
         prev_patient = int( self.get_previous_patient( ) )
         last_patient = int( covid_num)
@@ -185,18 +229,35 @@ class Covid19_thai:
 if __name__ == "__main__":
 
     #แหล่งข่าว url1: Work Point News
-    url_1 = 'https://covid19.workpointnews.com/?fbclid=IwAR0WRCG6g4vr6amf5XiXNpIzRImCpK3b3nMK2vGuyMCpwYEB7Maan0Z_BKM'
-    covid19_thai = Covid19_thai(url_1, 'covid19-thai-recorded.csv')
-    covid19_thai.report()
+    # url_1 = 'https://covid19.workpointnews.com/?fbclid=IwAR0WRCG6g4vr6amf5XiXNpIzRImCpK3b3nMK2vGuyMCpwYEB7Maan0Z_BKM'
+    url_2 = "https://covid19-cdn.workpointnews.com/api/constants.json"
 
+    #Path for MAC
+    PATH_MAC = '/Users/TopBook/Google Drive/CODE/AUTORUN/'
+    covid19_thai = Covid19_thai(url_2, PATH_MAC+ 'covid19-thai-recorded.csv')
+    # print( covid19_thai.report())
+
+    token_all = {   "user1 (ตังเอง)"           : '< user 1 - Token >',
+                    "ีuser2"       : '< please insert Token >',
+                    "user3"        : '< please insert Token >',
+                    "user4"         : '< please insert Token >',
+                    "user5" : '< please insert Token >' 
+            }
     chk, dmm  = covid19_thai.check_change()
 
-    if(chk == True ):
-    #เช็คยอดผู้ป่วยที่เปลี่ยนแปลง
+    covid19_thai.get_patient_url_2()
 
-        token = {   "ชื่อผไลน์ผู้รับ"          : '< input your token here!!! >'}
-        #ส่ง Line เมื่อยอดผู้ป่วยเปลี่ยนแปลง
-        covid19_thai.send_Line( token )
+    if( chk == False ):
 
+        token = {   "user1 (ตังเอง)"          : '< please insert Token >'}
+        covid19_thai.send_Line( token)
+        messenger = Sendline(  token [ "user1 (ตังเอง)" ]    )
+        messenger.sendtext("The program is running...")
+        print("The program is running...")
+
+    elif( chk ):
+        
+        covid19_thai.send_Line(  token_all )
+        print("Send to ALL ")
+    
     covid19_thai.update_to_csv()
-
