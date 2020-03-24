@@ -4,7 +4,7 @@ __COVID19-in-THAI__
 
 __Copyright (C) 2020 Akanit Kwangkaew__ 
 
-__ver.1.1__
+__ver.1.2__
 
 __www.facebook.com/codingjingjo__ 
 
