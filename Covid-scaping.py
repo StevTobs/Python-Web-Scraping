@@ -6,7 +6,7 @@
 Covid19-Thai
 Copyright (C) 2004 Akanit Kwangkaew
 www.facebook.com/codingjingjo
-"1.1"
+"1.2"
 
 Installation Process (MAC)
 1. >> pip install selenium
@@ -140,9 +140,7 @@ class Covid19_thai:
     def update_to_csv (self):
         csv_path = self.csv_path
         #ดึงข้อมูลจากแหล่งข่าวที่ 1 (url_1)
-        # covid_num, dummy, dummy, dummy, dummy  = self.get_patient_url_1()
-
-        covid_num, dummy, dummy, dummy, dummy  = self.get_patient_url_2()
+        covid_num, dummy, dummy, dummy, dummy  = self.get_patient_url_1()
 
         currentDT = datetime.datetime.now()
 
@@ -150,19 +148,36 @@ class Covid19_thai:
         key = currentDT.strftime("%Y-%m-%d %H:%M:%S")
         value = covid_num
      
-        with open(csv_path) as f:
+        with open(csv_path + 'covid19-thai-recorded.csv') as f:
             d = dict(filter(None, csv.reader(f)))
 
         #Update dictionary
         d.update( {key  : value} )
 
         #Save
-        with open( csv_path , 'w', newline="") as csv_file:  
+        with open( csv_path + 'covid19-thai-recorded.csv', 'w', newline="") as csv_file:  
             writer = csv.writer(csv_file)
             for k, v in d.items():
                 writer.writerow([k, v])
-        
         print("Saved to CSV!!")
+
+        chk, dummy = self.check_change( )
+        if( chk ):
+            #Backup
+
+            with open(csv_path + 'covid19-thai-recorded_backup.csv') as f:
+                d = dict(filter(None, csv.reader(f)))
+
+            #Update dictionary
+            d.update( {key  : value} )
+            key = currentDT.strftime("%Y-%m-%d")
+            value = covid_num
+            with open( csv_path + 'covid19-thai-recorded_backup.csv' , 'w', newline="") as csv_file:  
+                writer = csv.writer(csv_file)
+                for k, v in d.items():
+                    writer.writerow([k, v])
+            
+            print("Backed up to CSV!!")
     
     def report(self):
         
@@ -199,8 +214,8 @@ class Covid19_thai:
         text = ""
 
 
-        #ดึงข้อมูลจากแหล่งข่าวที่ 2 (url_2)
-        covid_num, dummy, dummy, dummy, dummy  = self.get_patient_url_2()
+        #ดึงข้อมูลจากแหล่งข่าวที่ 1 (url_1)
+        covid_num, covid_change_num, covid_recover_num, covid_dead_num, ref_url_1  = self.get_patient_url_1()
 
         prev_patient = int( self.get_previous_patient( ) )
         last_patient = int( covid_num)
@@ -208,14 +223,14 @@ class Covid19_thai:
         # print("prev_patient", prev_patient)
         # print("last_patient", last_patient)
 
-        if(prev_patient != last_patient):  
+        if(prev_patient != last_patient and int(covid_change_num) != 0 and int(covid_recover_num) !=0 and int(covid_dead_num) != 0 and int(last_patient) != int(covid_change_num)):  
 
             if(prev_patient < last_patient):
                 text = 'มียอดผู้ป่วยเพิ่มขึ้น '+ str(last_patient - prev_patient)  
                 chk_change = True
                 return chk_change , text
 
-            elif (prev_patient > last_patient) :   
+            elif (prev_patient > last_patient and int(covid_change_num) != 0 and int(covid_recover_num) !=0 and int(covid_dead_num != 0) ) :   
                 text = 'มียอดผู้ป่วยลดลง' + str( prev_patient - last_patient)  + ' :)'
                 chk_change = True
 
@@ -224,7 +239,6 @@ class Covid19_thai:
         else:
             chk_change = False
             return chk_change , text
-
 
 if __name__ == "__main__":
 
