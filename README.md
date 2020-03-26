@@ -23,4 +23,4 @@ ___
 (เร็วกว่า) Source: https://covid19.workpointnews.com/?fbclid=IwAR0WRCG6g4vr6amf5XiXNpIzRImCpK3b3nMK2vGuyMCpwYEB7Maan0Z_BKM
 
 (กรมควบคุมโรค)Source: https://ddcportal.ddc.moph.go.th/portal/apps/opsdashboard/index.html#/20f3466e075e45e5946aa87c96e8ad65
->>>>>>> a82b25da99f106f37da88eb98baef05ba2f3af36
+
