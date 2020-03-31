@@ -4,23 +4,11 @@
 '''
 
 Covid19-Thai
-Copyright (C) 2004 Akanit Kwangkaew
+Copyright (C) 2020 Akanit Kwangkaew
 www.facebook.com/codingjingjo
-"1.1"
-
-Installation Process (MAC)
-1. >> pip install selenium
-2. install: chrome driver (or other driver)
-  Download file from
-  https://chromedriver.storage.googleapis.com/index.html?path=81.0.4044.69/
-  Do not forget to correct version
-3. install: Beautifulsoup
-   >> pip install Beautifulsoup
-4. >> pip install songline
-
+"1.4"
 
 '''
-
 
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
@@ -29,13 +17,13 @@ import time
 import datetime 
 import csv 
 from bs4 import BeautifulSoup as soup
-
+import json
 
 class Covid19_thai:
 
     def __init__(self, url, csv_path):
         self.csv_path = csv_path
-        print("Loading ...", end ="")
+        print("Loading .", end ="")
         # driver = webdriver.Chrome(executable_path='C:/path/to/chromedriver.exe')
         opt = webdriver.ChromeOptions()
         opt.add_argument('headless') #hidden mode of chorme driver
@@ -56,43 +44,59 @@ class Covid19_thai:
         driver.close()
         print(".")
     
-    def get_patient_url_1(self):
+#    def get_patient_url_1(self):
+#
+#        self.ref_url_1 = "covid19.workpointnews.com"
+#        
+#
+#        #ดึงจำนวนผู้ป่วย
+#        raw = self.data.find("div", {"class": "css-ttf0vs e9w21k51"})
+#        # print(raw)
+#        covid19_patient_thai = raw.find("div", {"class": "css-b10qi3 e2xuun72"})
+#        self.covid_num = covid19_patient_thai.text
+#
+#        #ดึงจำนวนผู้ป่วยที่เปลี่ยนแปลง
+#       
+#        covid_change = raw.find("div", {"class": "css-rwqtsj e2xuun73"})       
+#        self.covid_change_num = covid_change.text
+#        print(covid_change)
+#        #รักษาหายแล้ว
+# 
+#        covid_recover = raw.find("div", {"class": "e9w21k54 css-1w3ca84 e2xuun70"})
+#        covid_recover = covid_recover.find("div", {"class": "css-9bda02 e2xuun72"})
+#        
+#        self.covid_recover_num = covid_recover.text
+#
+#
+#        #ดึงจำนวนผู้เสียชีวิต
+#        # <div class="e9w21k55 css-9se48y e2xuun70"><div class="css-1mxp76p e2xuun71">เสียชีวิต</div><div class="css-bj5ob2 e2xuun72">1</div></div>
+#        
+#        covid_dead = raw.find("div", {"class": "e9w21k55 css-ntnmqw e2xuun70"})
+#       
+#        self.covid_dead_num = covid_dead.find("div", {"class": "css-9bda02 e2xuun72"}).text
+#
+#        return self.covid_num, self.covid_change_num, self.covid_recover_num, self.covid_dead_num, self.ref_url_1
+    
+    def get_patient_url_2(self):
 
-        self.ref_url_1 = "covid19.workpointnews.com"
+        self.ref_url_2 = 'https:/covid19.th-stat.com/api/open/today'
+        x = json.loads(self.data.text)
         
+        #print(self.data.text)
+        
+        self.covid_num = x["Confirmed"]
+        self.covid_change_num = x["NewConfirmed"]
+        self.covid_recover_num = x["Recovered"]
+        self.covid_dead_num = x["Deaths"]
 
-        #ดึงจำนวนผู้ป่วย
-        raw = self.data.find("div", {"class": "css-ttf0vs e9w21k51"})
-        # print(raw)
-        covid19_patient_thai = raw.find("div", {"class": "css-b10qi3 e2xuun72"})
-        self.covid_num = covid19_patient_thai.text
-
-        #ดึงจำนวนผู้ป่วยที่เปลี่ยนแปลง
+        
        
-        covid_change = raw.find("div", {"class": "css-rwqtsj e2xuun73"})       
-        self.covid_change_num = covid_change.text
-
-        #รักษาหายแล้ว
- 
-        covid_recover = raw.find("div", {"class": "e9w21k54 css-1w3ca84 e2xuun70"})
-        covid_recover = covid_recover.find("div", {"class": "css-9bda02 e2xuun72"})
-        
-        self.covid_recover_num = covid_recover.text
-
-
-        #ดึงจำนวนผู้เสียชีวิต
-        # <div class="e9w21k55 css-9se48y e2xuun70"><div class="css-1mxp76p e2xuun71">เสียชีวิต</div><div class="css-bj5ob2 e2xuun72">1</div></div>
-        
-        covid_dead = raw.find("div", {"class": "e9w21k55 css-ntnmqw e2xuun70"})
-       
-        self.covid_dead_num = covid_dead.find("div", {"class": "css-9bda02 e2xuun72"}).text
-
-        return self.covid_num, self.covid_change_num, self.covid_recover_num, self.covid_dead_num, self.ref_url_1
+        return self.covid_num, self.covid_change_num, self.covid_recover_num, self.covid_dead_num, self.ref_url_2
 
     def get_previous_patient(self):
 
         #ดึงข้อมูลจากแหล่งข่าวที่ 1 (url_1)
-        covid_num, dummy, dummy, dummy, dummy = self.get_patient_url_1()
+        covid_num, dummy, dummy, dummy, dummy = self.get_patient_url_2()
         
         csv_path = self.csv_path
 
@@ -115,8 +119,9 @@ class Covid19_thai:
     def update_to_csv (self, chk):
         csv_path = self.csv_path
         #ดึงข้อมูลจากแหล่งข่าวที่ 1 (url_1)
-        covid_num, dummy, dummy, dummy, dummy  = self.get_patient_url_1()
-
+        covid_num, dummy, dummy, dummy, dummy  = self.get_patient_url_2()
+        covid_num = int(covid_num.replace(',', ''))
+        
         currentDT = datetime.datetime.now()
 
         #เตรียมข้อมูลที่จะ Update
@@ -159,17 +164,18 @@ class Covid19_thai:
         currentDT = datetime.datetime.now()       
         time_today =  str( currentDT.strftime("%d-%m-%Y %H:%M:%S") )
 
-        #ดึงข้อมูลจากแหล่งข่าวที่ 1 (url_1)
-        covid_num, covid_change_num, covid_recover_num, covid_dead_num, ref_url_1 = self.get_patient_url_1()
+       
+        covid_num, covid_change_num, covid_recover_num, covid_dead_num, ref_url_2 = self.get_patient_url_2()
 
         chk_change , text = self.check_change()
 
-        report_text = text + '\nขณะนี้มียอดผู้ป่วย COVID19 ในประเทศไทย\nจำนวน: '+covid_num+' คน'
+        report_text = 'ยอดผู้ป่วย COVID19 ในไทย\nสะสม: '+str(covid_num)+' คน ' + str(covid_change_num)
+
         # report_text = report_text + '\n ' + covid_change_num
-        report_text = report_text + '\nรักษาหาย: '+covid_recover_num+' คน'
-        report_text = report_text + '\nเสียชีวิต: '+covid_dead_num +' คน'
+        report_text = report_text + '\nรักษาหาย: '+str(covid_recover_num)+' คน'
+        report_text = report_text + '\nเสียชีวิต: '+str(covid_dead_num) +' คน'
         report_text = report_text + '\nTime: '+ time_today
-        report_text = report_text + '\nSource: '+ ref_url_1
+        report_text = report_text + '\nSource: '+ ref_url_2
         # print(report_text )
 
         return report_text
@@ -189,24 +195,30 @@ class Covid19_thai:
         text = ""
 
 
-        #ดึงข้อมูลจากแหล่งข่าวที่ 1 (url_1)
-        covid_num, covid_change_num, covid_recover_num, covid_dead_num, ref_url_1  = self.get_patient_url_1()
+        #ดึงข้อมูลจากแหล่งข่าวที่ 1 (url_1
+        #covid_num, covid_change_num, covid_recover_num, covid_dead_num, ref_url_1  = self.get_patient_url_1()
+        
+        #Update
+        covid_num, covid_change_num, covid_recover_num, covid_dead_num, ref_url_2  = self.get_patient_url_2()
 
-        prev_patient = int( self.get_previous_patient( ) )
-        last_patient = int( covid_num)
+        prev_patient = self.get_previous_patient( ) 
+        prev_patient = int(prev_patient.replace(',', ''))
 
-        # print("prev_patient", prev_patient)
-        # print("last_patient", last_patient)
+        last_patient = covid_num
+        #last_patient = int(last_patient.replace(',', ''))
+
+        #covid_recover_num = int( covid_recover_num.replace(',', ''))
+        #covid_dead_num = int( covid_dead_num.replace(',', ''))
 
         if(prev_patient != last_patient and int(covid_recover_num) !=0 and int(covid_dead_num) != 0 ):  
 
             if(prev_patient < last_patient):
-                text = 'มียอดผู้ป่วยเพิ่มขึ้น '+ str(last_patient - prev_patient)  
+                text = covid_change_num
                 chk_change = True
                 return chk_change , text
 
             elif (prev_patient > last_patient and int(covid_recover_num) !=0 and int(covid_dead_num != 0) ) :   
-                text = 'มียอดผู้ป่วยลดลง' + str( prev_patient - last_patient)  + ' :)'
+                text = covid_change_num
                 chk_change = True
 
                 return chk_change , text
@@ -215,12 +227,33 @@ class Covid19_thai:
             chk_change = False
             return chk_change , text
 
+
 if __name__ == "__main__":
 
     #แหล่งข่าว url1: Work Point News
-    # url_1 = 'https://covid19.workpointnews.com/?fbclid=IwAR0WRCG6g4vr6amf5XiXNpIzRImCpK3b3nMK2vGuyMCpwYEB7Maan0Z_BKM'
-    url_2 = "https://covid19-cdn.workpointnews.com/api/constants.json"
+    #url_1 = 'https://covid19.workpointnews.com/?fbclid=IwAR0WRCG6g4vr6amf5XiXNpIzRImCpK3b3nMK2vGuyMCpwYEB7Maan0Z_BKM'
+    url_2 = 'https:/covid19.th-stat.com/api/open/today'
+    #Path for MAC
+    PATH_MAC = '/Users/TopBook/Google Drive/CODE/AUTORUN/'
+    covid19_thai = Covid19_thai(url_2, PATH_MAC)
+    txt = covid19_thai.get_patient_url_2()
 
+
+    # chk, dmm  = covid19_thai.check_change()
+    covid19_thai.report()
+
+    #https:/covid19.th-stat.com/api/open/today
+  
+
+
+    
+
+if __name__ == "__main__":
+
+    #แหล่งข่าว url1: Work Point News
+    # url = 'https://covid19.workpointnews.com/?fbclid=IwAR0WRCG6g4vr6amf5XiXNpIzRImCpK3b3nMK2vGuyMCpwYEB7Maan0Z_BKM'
+    # url = "https://covid19-cdn.workpointnews.com/api/constants.json"
+    url_2 = 'https:/covid19.th-stat.com/api/open/today'
     #Path for MAC
     PATH_MAC = '/Users/TopBook/Google Drive/CODE/AUTORUN/'
     covid19_thai = Covid19_thai(url_2, PATH_MAC+ 'covid19-thai-recorded.csv')
@@ -246,7 +279,7 @@ if __name__ == "__main__":
 
     elif( chk ):
         
-        covid19_thai.send_Line(  token_all )
+        # covid19_thai.send_Line(  token_all )
         print("Send to ALL ")
     
     covid19_thai.update_to_csv(chk)
